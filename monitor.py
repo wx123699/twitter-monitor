@@ -31,7 +31,7 @@ def save_last_ids(ids):
 
 async def main():
     api = API()
-    await api.pool.add_account(TWITTER_USERNAME, TWITTER_PASSWORD)
+    await api.pool.add_account(TWITTER_USERNAME, TWITTER_PASSWORD, TWITTER_USERNAME, TWITTER_PASSWORD)
     await api.pool.login_all()
 
     last_ids = load_last_ids()
@@ -41,9 +41,11 @@ async def main():
         try:
             user = await api.user_by_login(account)
             if not user:
+                print(f"User @{account} not found")
                 continue
             tweets = await gather(api.user_tweets(user.id, limit=5))
             if not tweets:
+                print(f"No tweets found for @{account}")
                 continue
             last_id = last_ids.get(account, 0)
             new_tweets = [t for t in tweets if t.id > last_id]
